@@ -22,6 +22,12 @@ RUN \
     curl -fsSL https://get.docker.com/ | sh && \
     mkdir /tmp/docker-files
 
+RUN curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.5/fixuid-0.5-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - && \
+    chown root:root /usr/local/bin/fixuid && \
+    chmod 4755 /usr/local/bin/fixuid && \
+    mkdir -p /etc/fixuid && \
+    printf "user: ${APPLICATION_USER}\ngroup: ${APPLICATION_GROUP}\npaths:\n - /home/${APPLICATION_USER}\n - /home/${APPLICATION_USER}/.composer/cache\n - /tmp\n" > /etc/fixuid/config.yml
+
 COPY .bashrc-additional.sh /tmp/docker-files/
 COPY apache/apache.conf /opt/docker/etc/httpd/vhost.common.d/
 COPY provision/entrypoint.d/* /opt/docker/provision/entrypoint.d/
